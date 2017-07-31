@@ -21,8 +21,8 @@ npm run dist
 This will place a packaged version of the app and an installer for the platform this command was run on into the `/dist` folder.
 
 ### Related Repositories ###
-* [audiomoth-hid](https://github.com/OpenAcousticDevices)
-* [AudioMoth Configuration App](https://github.com/OpenAcousticDevices)
+* [audiomoth-hid](https://github.com/OpenAcousticDevices/audiomoth-hid)
+* [AudioMoth Configuration App](https://github.com/OpenAcousticDevices/AudioMoth-Config-App)
 
 ### License ###
 
