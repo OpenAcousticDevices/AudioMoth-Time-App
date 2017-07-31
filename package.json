@@ -1,0 +1,57 @@
+{
+  "name": "AudioMothTimeSetter",
+  "version": "1.0.0",
+  "description": "A time setting app for the AudioMoth acoustic logger.",
+  "main": "main.js",
+  "author": "openacousticdevices.info",
+  "license": "ISC",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron-builder install-app-deps && electron .",
+    "pack": "build --dir",
+    "dist": "build && electron-builder install-app-deps"
+  },
+  "build": {
+    "asar": {
+      "smartUnpack": true
+  },
+    "appId": "info.openacousticdevices.audiomothtimesetter",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 430,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "createDesktopShortcut": true
+    },
+    "linux": {
+      "icon": "build/"
+    }
+  },
+  "devDependencies": {
+    "electron": "1.4.13",
+    "electron-builder": "19.13.0"
+  },
+  "dependencies": {
+    "audiomoth-hid": "*",
+    "bootstrap": "3.3.7",
+    "strftime": "0.10.0",
+    "electron-debug": "1.1.0"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  }
+}
