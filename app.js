@@ -37,6 +37,8 @@ function disableDisplay() {
 
     setTimeButton.disabled = true;
 
+    initialiseDisplay();
+
 }
 
 function enableDisplayAndShowTime(date) {
