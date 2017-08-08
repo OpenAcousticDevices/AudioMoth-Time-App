@@ -1,6 +1,6 @@
 {
   "name": "AudioMothTimeSetter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A time setting app for the AudioMoth acoustic logger.",
   "main": "main.js",
   "author": "openacousticdevices.info",
@@ -28,14 +28,16 @@
           "type": "link",
           "path": "/Applications"
         }
-      ]
+      ],
+      "artifactName": "AudioMothTimeSetterSetup${version}.dmg"
     },
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
     },
     "nsis": {
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "artifactName": "AudioMothTimesetterSetup${version}.exe"
     },
     "linux": {
       "icon": "build/"
