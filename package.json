@@ -1,6 +1,6 @@
 {
   "name": "AudioMothTimeSetter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A time setting app for the AudioMoth acoustic logger.",
   "main": "main.js",
   "author": "openacousticdevices.info",
