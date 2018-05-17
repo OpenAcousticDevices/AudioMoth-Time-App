@@ -44,8 +44,8 @@
     }
   },
   "devDependencies": {
-    "electron": "1.4.13",
-    "electron-builder": "19.13.0"
+    "electron": "2.0.0",
+    "electron-builder": "20.13.0"
   },
   "dependencies": {
     "audiomoth-hid": "*",
@@ -54,6 +54,6 @@
     "electron-debug": "1.1.0"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.10.0"
   }
 }
