@@ -41,7 +41,8 @@
       "artifactName": "AudioMothTimesetterSetup${version}.exe"
     },
     "linux": {
-      "icon": "build/"
+      "icon": "build/",
+      "category": "Utility"
     }
   },
   "devDependencies": {
