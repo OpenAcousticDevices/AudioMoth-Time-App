@@ -1,54 +1,50 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-		<style>
-			button {font-size: 18pt; text-align: center; width: 95%;}
-		</style>
-		<title>AudioMoth</title>
-	</head>
-	<body style="background: #FFFFFF; font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
-		<div class="container">
 
-			<div class="row" style="margin-top: 10px;">
-				<div style="border: #cdcdcd thin solid; margin-left: 2%; width: 96%;">
-					<div class="row">
-						<div class="col-xs-12" style="text-align: center; padding-top: 8px">
-							<span id="time-display" style="font-size: 44px; font-family: 'Lucida Console', Monaco, monospace; width: 100%; text-align: center; border: none;">00:00:00 00/00/0000</span>
-						</div>
-					</div>
-				</div>
-			</div>
+    <head>
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <title>AudioMoth</title>
+    </head>
 
-			<div class="row" style="margin-top: 10px; margin-bottom: 10px;">
-				<div style="border: #cdcdcd thin solid; margin-left: 2%; width: 96%;">
-					<div class="row" style="margin-top: 10px; margin-bottom: 10px;">
-						<div class="col-xs-6" style="text-align: left;">
-							<span id="id-label" style="margin-left: 8%;">ID:</span>
-						</div>
-						<div class="col-xs-6" style="text-align: right;">
-							<input id= id-display style="margin-right: 20px; text-align: right; border: none;" readonly value="0000000000000000">
-						</div>
-					</div>
-					<div class="row" style="margin-top: 10px; margin-bottom: 10px;">
-						<div class="col-xs-6" style="text-align: left;">
-							<span id="battery-label" style="margin-left: 8%;">Battery:</span>
-						</div>
-						<div class="col-xs-6" style="text-align: right;">
-							<span id= battery-display style="margin-right: 20px;">0.0V</span>
-						</div>
-					</div>
-				</div>
-			</div>
+    <body style="background: #FFFFFF; font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
+        <div class="container">
+            <div class="row" style="margin-top: 10px;">
+                <div style="border: #cdcdcd thin solid; margin-left: 2%; width: 96%;">
+                    <div class="row">
+                        <div class="col-12" style="text-align: center; padding-top: 8px">
+                            <span id="time-display" style="font-size: 44px; font-family: &apos;Lucida Console&apos;, Monaco, monospace; width: 100%; text-align: center; border: none;">00:00:00 00/00/0000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                <div style="border: #cdcdcd thin solid; margin-left: 2%; width: 96%;">
+                    <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                        <div class="col-6" style="text-align: left;">
+                            <span id="id-label" style="margin-left: 8%;">ID:</span>
+                        </div>
+                        <div class="col-6" style="text-align: right;">
+                            <input id="id-display" style="margin-right: 20px; text-align: right; border: none;" readonly value="0000000000000000">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                        <div class="col-6" style="text-align: left;">
+                            <span id="battery-label" style="margin-left: 8%;">Battery:</span>
+                        </div>
+                        <div class="col-6" style="text-align: right;">
+                            <span id="battery-display" style="margin-right: 20px;">0.0V</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div style="text-align: center; margin-left: 2%; width: 96%;">
+                    <button id="set-time-button" class="btn btn-success" style="width: 100%;" disabled>Set Time</button>
+                </div>
+            </div>
+        </div>
+    </body>
 
-			<div class="row" style="margin-top: 10px;">
-				<div style="text-align: center; margin-left: 2%; width: 96%;">
-					<button id="set-time-button" class="btn btn-success" style="width: 100%;" disabled>Set Time</button>
-				</div>
-			</div>
+    <script src="app.js" charset="utf-8"></script>
 
-		</div>
-
-		<script src="app.js" charset="utf-8"></script>
-	</body>
 </html>
