@@ -1,4 +1,4 @@
-# AudioMoth Timesetter App #
+# AudioMoth Timesetter #
 
 An Electron-based application capable of setting the on-board clock of the AudioMoth recording device.
 For more details on the device itself, visit [www.openacousticdevices.info](http://www.openacousticdevices.info).
