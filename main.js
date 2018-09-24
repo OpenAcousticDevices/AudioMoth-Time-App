@@ -25,7 +25,7 @@ function openAboutWindow() {
 
     var aboutWindow = new BrowserWindow({
         width: 400,
-        height: 300,
+        height: 325,
         resizable: false,
         fullscreenable: false,
         icon: path.join(__dirname, "/build/icon.ico")
@@ -38,14 +38,14 @@ function openAboutWindow() {
 
 app.on('ready', function () {
 
-    var mainWindow, menuTemplate, menu, windowHeight = 280;
+    var mainWindow, menuTemplate, menu, windowHeight;
 
     if (process.platform === 'darwin') {
-        windowHeight = 242;
-    }
-
-    if (process.platform === 'linux') {
-        windowHeight = 240;
+        windowHeight = 306;
+    } else if (process.platform === 'linux') {
+        windowHeight = 308;
+    } else {
+        windowHeight = 330;
     }
 
     mainWindow = new BrowserWindow({

@@ -15,6 +15,8 @@ var audiomoth = require('audiomoth-hid');
 
 var timeDisplay = document.getElementById('time-display');
 var idDisplay = document.getElementById('id-display');
+var firmwareVersionDisplay = document.getElementById('firmware-version-display');
+var firmwareDescriptionDisplay = document.getElementById('firmware-description-display');
 var batteryDisplay = document.getElementById('battery-display');
 
 var setTimeButton = document.getElementById('set-time-button');
@@ -32,6 +34,10 @@ function disableDisplay() {
     timeDisplay.style.color = "lightgrey";
 
     idDisplay.style.color = "lightgrey";
+
+    firmwareVersionDisplay.style.color = "lightgrey";
+
+    firmwareDescriptionDisplay.style.color = "lightgrey";
 
     batteryDisplay.style.color = "lightgrey";
 
@@ -53,7 +59,7 @@ function enableDisplayAndShowTime(date) {
 
 }
 
-/* Battery display functions */
+/* Device information display functions */
 
 function enableDisplayAndShowBatteryState(batteryState) {
 
@@ -63,17 +69,27 @@ function enableDisplayAndShowBatteryState(batteryState) {
 
 }
 
-/* ID display functions */
-
 function enableDisplayAndShowID(id) {
 
-    if (idDisplay !== id) {
-
-        idDisplay.value = id;
-
-    }
+    idDisplay.value = id;
 
     idDisplay.style.color = "black";
+
+}
+
+function enableDisplayAndShowVersionNumber(version) {
+
+    firmwareVersionDisplay.textContent = version;
+
+    firmwareVersionDisplay.style.color = "black";
+
+}
+
+function enableDisplayAndShowVersionDescription(description) {
+
+    firmwareDescriptionDisplay.textContent = description;
+
+    firmwareDescriptionDisplay.style.color = "black";
 
 }
 
@@ -90,6 +106,54 @@ function errorOccurred(err) {
 
 /* Device interaction functions */
 
+function requestFirmwareDescription() {
+
+    audiomoth.getFirmwareDescription(function (err, description) {
+
+        if (err) {
+
+            errorOccurred(err);
+
+        } else if (description === null) {
+
+            disableDisplay();
+
+        } else {
+
+            enableDisplayAndShowVersionDescription(description);
+
+        }
+
+    });
+
+}
+
+function requestFirmwareVersion() {
+
+    var versionArr;
+
+    audiomoth.getFirmwareVersion(function (err, versionArr) {
+
+        if (err) {
+
+            errorOccurred(err);
+
+        } else if (versionArr === null) {
+
+            disableDisplay();
+
+        } else {
+
+            enableDisplayAndShowVersionNumber(versionArr[0] + "." + versionArr[1] + "." + versionArr[2]);
+
+            requestFirmwareDescription();
+
+        }
+
+    });
+
+}
+
 function requestBatteryState() {
 
     audiomoth.getBatteryState(function (err, batteryState) {
@@ -105,6 +169,8 @@ function requestBatteryState() {
         } else {
 
             enableDisplayAndShowBatteryState(batteryState);
+
+            requestFirmwareVersion();
 
         }
 
@@ -197,4 +263,4 @@ initialiseDisplay();
 
 setTimeButton.addEventListener('click', setTime);
 
-setTimeout(requestTime, 1000);
+requestTime();
