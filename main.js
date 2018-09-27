@@ -68,14 +68,16 @@ app.on('ready', function () {
     }, {
         label: "Help",
         submenu: [{
-            label: "Open Acoustic Devices website",
-            click: function () {
-                shell.openExternal("https://openacousticdevices.info");
-            }
-        }, {
             label: "About",
             click: function () {
                 openAboutWindow();
+            }
+        }, {
+            type: 'separator'
+        }, {
+            label: "Open Acoustic Devices Website",
+            click: function () {
+                shell.openExternal("https://openacousticdevices.info");
             }
         }]
     }];
