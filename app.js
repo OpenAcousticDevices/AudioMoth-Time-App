@@ -25,7 +25,7 @@ var setTimeButton = document.getElementById('set-time-button');
 
 function initialiseDisplay() {
 
-    timeDisplay.value = "00:00:00 01/01/1970";
+    timeDisplay.value = "00:00:00 01/01/1970 UTC";
 
 }
 
@@ -51,7 +51,7 @@ function enableDisplayAndShowTime(date) {
 
     var strftimeUTC = strftime.timezone(0);
 
-    timeDisplay.textContent = strftimeUTC("%H:%M:%S %d/%m/%Y", date);
+    timeDisplay.textContent = strftimeUTC("%H:%M:%S %d/%m/%Y UTC", date);
 
     timeDisplay.style.color = "black";
 
