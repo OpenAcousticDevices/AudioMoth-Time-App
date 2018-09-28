@@ -22,7 +22,7 @@ This will place a packaged version of the app and an installer for the platform 
 
 ### Related Repositories ###
 * [audiomoth-hid](https://github.com/OpenAcousticDevices/audiomoth-hid)
-* [AudioMoth Configuration App](https://github.com/OpenAcousticDevices/AudioMoth-Config-App)
+* [AudioMoth Configuration App](https://github.com/OpenAcousticDevices/AudioMoth-Configuration-App)
 
 ### License ###
 
