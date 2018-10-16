@@ -22,8 +22,11 @@ var applicationMenu = menu.getApplicationMenu();
 var timeDisplay = document.getElementById('time-display');
 var idLabel = document.getElementById('id-label');
 var idDisplay = document.getElementById('id-display');
+var firmwareVersionLabel = document.getElementById('firmware-version-label');
 var firmwareVersionDisplay = document.getElementById('firmware-version-display');
+var firmwareDescriptionLabel = document.getElementById('firmware-description-label');
 var firmwareDescriptionDisplay = document.getElementById('firmware-description-display');
+var batteryLabel = document.getElementById('battery-label');
 var batteryDisplay = document.getElementById('battery-display');
 
 var setTimeButton = document.getElementById('set-time-button');
@@ -46,9 +49,15 @@ function disableDisplay() {
 
     firmwareVersionDisplay.style.color = "lightgrey";
 
+    firmwareVersionLabel.style.color = "lightgrey";
+
     firmwareDescriptionDisplay.style.color = "lightgrey";
 
+    firmwareDescriptionLabel.style.color = "lightgrey";
+
     batteryDisplay.style.color = "lightgrey";
+
+    batteryLabel.style.color = "lightgrey";
 
     setTimeButton.disabled = true;
 
@@ -80,6 +89,8 @@ function enableDisplayAndShowBatteryState(batteryState) {
 
     batteryDisplay.style.color = "black";
 
+    batteryLabel.style.color = "black";
+
 }
 
 function enableDisplayAndShowID(id) {
@@ -98,6 +109,8 @@ function enableDisplayAndShowVersionNumber(version) {
 
     firmwareVersionDisplay.style.color = "black";
 
+    firmwareVersionLabel.style.color = "black";
+
 }
 
 function enableDisplayAndShowVersionDescription(description) {
@@ -105,6 +118,8 @@ function enableDisplayAndShowVersionDescription(description) {
     firmwareDescriptionDisplay.textContent = description;
 
     firmwareDescriptionDisplay.style.color = "black";
+
+    firmwareDescriptionLabel.style.color = "black";
 
 }
 
