@@ -8,12 +8,19 @@
 
 /*global document */
 
+var electron = require('electron');
+var clipboard = electron.remote.clipboard;
+var menu = electron.remote.Menu;
+
 var strftime = require('strftime').utc();
 var audiomoth = require('audiomoth-hid');
 
 /* UI components */
 
+var applicationMenu = menu.getApplicationMenu();
+
 var timeDisplay = document.getElementById('time-display');
+var idLabel = document.getElementById('id-label');
 var idDisplay = document.getElementById('id-display');
 var firmwareVersionDisplay = document.getElementById('firmware-version-display');
 var firmwareDescriptionDisplay = document.getElementById('firmware-description-display');
@@ -35,6 +42,8 @@ function disableDisplay() {
 
     idDisplay.style.color = "lightgrey";
 
+    idLabel.style.color = "lightgrey";
+
     firmwareVersionDisplay.style.color = "lightgrey";
 
     firmwareDescriptionDisplay.style.color = "lightgrey";
@@ -44,6 +53,8 @@ function disableDisplay() {
     setTimeButton.disabled = true;
 
     initialiseDisplay();
+
+    applicationMenu.getMenuItemById("copyid").enabled = false;
 
 }
 
@@ -56,6 +67,8 @@ function enableDisplayAndShowTime(date) {
     timeDisplay.style.color = "black";
 
     setTimeButton.disabled = false;
+
+    applicationMenu.getMenuItemById("copyid").enabled = true;
 
 }
 
@@ -71,9 +84,11 @@ function enableDisplayAndShowBatteryState(batteryState) {
 
 function enableDisplayAndShowID(id) {
 
-    idDisplay.value = id;
+    idDisplay.textContent = id;
 
     idDisplay.style.color = "black";
+
+    idLabel.style.color = "black";
 
 }
 
@@ -129,8 +144,6 @@ function requestFirmwareDescription() {
 }
 
 function requestFirmwareVersion() {
-
-    var versionArr;
 
     audiomoth.getFirmwareVersion(function (err, versionArr) {
 
@@ -254,6 +267,17 @@ function setTime() {
     });
 
 }
+
+electron.ipcRenderer.on('copyID', function () {
+
+    clipboard.writeText(idDisplay.textContent);
+    idDisplay.style.color = "green";
+
+    setTimeout(function () {
+        idDisplay.style.color = "";
+    }, 5000);
+
+});
 
 /* Main code entry point */
 

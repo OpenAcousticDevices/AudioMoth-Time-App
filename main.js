@@ -59,6 +59,16 @@ app.on('ready', function () {
     menuTemplate = [{
         label: "File",
         submenu: [{
+            id: "copyid",
+            label: "Copy Device ID",
+            accelerator: "CommandOrControl+I",
+            click: function () {
+                mainWindow.webContents.send("copyID");
+            },
+            enabled: false
+        }, {
+            type: 'separator'
+        }, {
             label: "Quit",
             accelerator: "CommandOrControl+Q",
             click: function () {
