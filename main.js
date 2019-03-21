@@ -23,12 +23,20 @@ var path = require('path');
 
 function openAboutWindow() {
 
-    var aboutWindow = new BrowserWindow({
+    var aboutWindow, iconLocation;
+
+    iconLocation = "/build/icon.ico";
+
+    if (process.platform === 'linux') {
+        iconLocation = "/build/icon.png";
+    }
+
+    aboutWindow = new BrowserWindow({
         width: 400,
         height: 325,
         resizable: false,
         fullscreenable: false,
-        icon: path.join(__dirname, "/build/icon.ico")
+        icon: path.join(__dirname, iconLocation)
     });
 
     aboutWindow.setMenu(null);
@@ -38,12 +46,15 @@ function openAboutWindow() {
 
 app.on('ready', function () {
 
-    var mainWindow, menuTemplate, menu, windowHeight;
+    var mainWindow, menuTemplate, menu, windowHeight, iconLocation;
+
+    iconLocation = "/build/icon.ico";
 
     if (process.platform === 'darwin') {
         windowHeight = 245;
     } else if (process.platform === 'linux') {
         windowHeight = 247;
+        iconLocation = "/build/icon.png";
     } else {
         windowHeight = 269;
     }
@@ -53,7 +64,7 @@ app.on('ready', function () {
         height: windowHeight,
         resizable: false,
         fullscreenable: false,
-        icon: path.join(__dirname, "/build/icon.ico")
+        icon: path.join(__dirname, iconLocation)
     });
 
     menuTemplate = [{
