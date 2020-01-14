@@ -1,5 +1,6 @@
 {
   "name": "AudioMoth-Time",
+  "productName": "AudioMoth Time App",
   "version": "1.0.3",
   "description": "The time app for the AudioMoth acoustic acoustic monitoring device.",
   "main": "main.js",
@@ -38,7 +39,9 @@
     },
     "nsis": {
       "createDesktopShortcut": true,
-      "artifactName": "AudioMothTimeAppSetup${version}.exe"
+      "artifactName": "AudioMothTimeAppSetup${version}.exe",
+      "shortcutName": "AudioMoth Time App",
+      "uninstallDisplayName": "AudioMoth Time App ${version}"
     },
     "linux": {
       "icon": "build/",
