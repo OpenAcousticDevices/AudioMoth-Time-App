@@ -36,7 +36,10 @@ function openAboutWindow() {
         height: 325,
         resizable: false,
         fullscreenable: false,
-        icon: path.join(__dirname, iconLocation)
+        icon: path.join(__dirname, iconLocation),
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
 
     aboutWindow.setMenu(null);
@@ -64,7 +67,10 @@ app.on('ready', function () {
         height: windowHeight,
         resizable: false,
         fullscreenable: false,
-        icon: path.join(__dirname, iconLocation)
+        icon: path.join(__dirname, iconLocation),
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
 
     menuTemplate = [{
