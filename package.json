@@ -1,6 +1,5 @@
 {
   "name": "AudioMoth-Time",
-  "productName": "AudioMoth Time App",
   "version": "1.0.4",
   "description": "The time app for the AudioMoth acoustic acoustic monitoring device.",
   "main": "main.js",
