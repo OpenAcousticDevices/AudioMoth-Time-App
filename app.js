@@ -35,7 +35,7 @@ var setTimeButton = document.getElementById('set-time-button');
 
 function initialiseDisplay() {
 
-    timeDisplay.value = "00:00:00 01/01/1970 UTC";
+    timeDisplay.textContent = "00:00:00 01/01/1970 UTC";
 
 }
 
@@ -60,8 +60,6 @@ function disableDisplay() {
     batteryLabel.style.color = "lightgrey";
 
     setTimeButton.disabled = true;
-
-    initialiseDisplay();
 
     applicationMenu.getMenuItemById("copyid").enabled = false;
 
