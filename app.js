@@ -6,7 +6,7 @@
 
 'use strict';
 
-/*global document */
+/* global document */
 
 var electron = require('electron');
 var clipboard = electron.remote.clipboard;
@@ -33,97 +33,97 @@ var setTimeButton = document.getElementById('set-time-button');
 
 /* Time display functions */
 
-function initialiseDisplay() {
+function initialiseDisplay () {
 
-    timeDisplay.textContent = "00:00:00 01/01/1970 UTC";
+    timeDisplay.textContent = '00:00:00 01/01/1970 UTC';
 
 }
 
-function disableDisplay() {
+function disableDisplay () {
 
-    timeDisplay.style.color = "lightgrey";
+    timeDisplay.style.color = 'lightgrey';
 
-    idDisplay.style.color = "lightgrey";
+    idDisplay.style.color = 'lightgrey';
 
-    idLabel.style.color = "lightgrey";
+    idLabel.style.color = 'lightgrey';
 
-    firmwareVersionDisplay.style.color = "lightgrey";
+    firmwareVersionDisplay.style.color = 'lightgrey';
 
-    firmwareVersionLabel.style.color = "lightgrey";
+    firmwareVersionLabel.style.color = 'lightgrey';
 
-    firmwareDescriptionDisplay.style.color = "lightgrey";
+    firmwareDescriptionDisplay.style.color = 'lightgrey';
 
-    firmwareDescriptionLabel.style.color = "lightgrey";
+    firmwareDescriptionLabel.style.color = 'lightgrey';
 
-    batteryDisplay.style.color = "lightgrey";
+    batteryDisplay.style.color = 'lightgrey';
 
-    batteryLabel.style.color = "lightgrey";
+    batteryLabel.style.color = 'lightgrey';
 
     setTimeButton.disabled = true;
 
-    applicationMenu.getMenuItemById("copyid").enabled = false;
+    applicationMenu.getMenuItemById('copyid').enabled = false;
 
 }
 
-function enableDisplayAndShowTime(date) {
+function enableDisplayAndShowTime (date) {
 
     var strftimeUTC = strftime.timezone(0);
 
-    timeDisplay.textContent = strftimeUTC("%H:%M:%S %d/%m/%Y UTC", date);
+    timeDisplay.textContent = strftimeUTC('%H:%M:%S %d/%m/%Y UTC', date);
 
-    timeDisplay.style.color = "black";
+    timeDisplay.style.color = 'black';
 
     setTimeButton.disabled = false;
 
-    applicationMenu.getMenuItemById("copyid").enabled = true;
+    applicationMenu.getMenuItemById('copyid').enabled = true;
 
 }
 
 /* Device information display functions */
 
-function enableDisplayAndShowBatteryState(batteryState) {
+function enableDisplayAndShowBatteryState (batteryState) {
 
     batteryDisplay.textContent = batteryState;
 
-    batteryDisplay.style.color = "black";
+    batteryDisplay.style.color = 'black';
 
-    batteryLabel.style.color = "black";
+    batteryLabel.style.color = 'black';
 
 }
 
-function enableDisplayAndShowID(id) {
+function enableDisplayAndShowID (id) {
 
     idDisplay.textContent = id;
 
-    idDisplay.style.color = "black";
+    idDisplay.style.color = 'black';
 
-    idLabel.style.color = "black";
+    idLabel.style.color = 'black';
 
 }
 
-function enableDisplayAndShowVersionNumber(version) {
+function enableDisplayAndShowVersionNumber (version) {
 
     firmwareVersionDisplay.textContent = version;
 
-    firmwareVersionDisplay.style.color = "black";
+    firmwareVersionDisplay.style.color = 'black';
 
-    firmwareVersionLabel.style.color = "black";
+    firmwareVersionLabel.style.color = 'black';
 
 }
 
-function enableDisplayAndShowVersionDescription(description) {
+function enableDisplayAndShowVersionDescription (description) {
 
     firmwareDescriptionDisplay.textContent = description;
 
-    firmwareDescriptionDisplay.style.color = "black";
+    firmwareDescriptionDisplay.style.color = 'black';
 
-    firmwareDescriptionLabel.style.color = "black";
+    firmwareDescriptionLabel.style.color = 'black';
 
 }
 
 /* Error response */
 
-function errorOccurred(err) {
+function errorOccurred (err) {
 
     console.error(err);
 
@@ -131,10 +131,9 @@ function errorOccurred(err) {
 
 }
 
-
 /* Device interaction functions */
 
-function requestFirmwareDescription() {
+function requestFirmwareDescription () {
 
     audiomoth.getFirmwareDescription(function (err, description) {
 
@@ -156,7 +155,7 @@ function requestFirmwareDescription() {
 
 }
 
-function requestFirmwareVersion() {
+function requestFirmwareVersion () {
 
     audiomoth.getFirmwareVersion(function (err, versionArr) {
 
@@ -170,7 +169,7 @@ function requestFirmwareVersion() {
 
         } else {
 
-            enableDisplayAndShowVersionNumber(versionArr[0] + "." + versionArr[1] + "." + versionArr[2]);
+            enableDisplayAndShowVersionNumber(versionArr[0] + '.' + versionArr[1] + '.' + versionArr[2]);
 
             requestFirmwareDescription();
 
@@ -180,7 +179,7 @@ function requestFirmwareVersion() {
 
 }
 
-function requestBatteryState() {
+function requestBatteryState () {
 
     audiomoth.getBatteryState(function (err, batteryState) {
 
@@ -204,7 +203,7 @@ function requestBatteryState() {
 
 }
 
-function requestID() {
+function requestID () {
 
     audiomoth.getID(function (err, id) {
 
@@ -228,7 +227,7 @@ function requestID() {
 
 }
 
-function requestTime() {
+function requestTime () {
 
     audiomoth.getTime(function (err, date) {
 
@@ -254,7 +253,7 @@ function requestTime() {
 
 }
 
-function setTime() {
+function setTime () {
 
     audiomoth.setTime(new Date(), function (err, date) {
 
@@ -270,9 +269,11 @@ function setTime() {
 
             enableDisplayAndShowTime(date);
 
-            setTimeButton.style.color = "green";
+            setTimeButton.style.color = 'green';
             setTimeout(function () {
-                setTimeButton.style.color = "";
+
+                setTimeButton.style.color = '';
+
             }, 1000);
 
         }
@@ -284,10 +285,12 @@ function setTime() {
 electron.ipcRenderer.on('copyID', function () {
 
     clipboard.writeText(idDisplay.textContent);
-    idDisplay.style.color = "green";
+    idDisplay.style.color = 'green';
 
     setTimeout(function () {
-        idDisplay.style.color = "";
+
+        idDisplay.style.color = '';
+
     }, 5000);
 
 });

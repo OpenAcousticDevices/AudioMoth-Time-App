@@ -6,8 +6,6 @@
 
 'use strict';
 
-/*jslint nomen: true*/
-
 var electron = require('electron');
 var app = electron.app;
 
@@ -16,19 +14,21 @@ var Menu = electron.Menu;
 var shell = electron.shell;
 
 require('electron-debug')({
-    showDevTools: "undocked"
+    showDevTools: 'undocked'
 });
 
 var path = require('path');
 
-function openAboutWindow() {
+function openAboutWindow () {
 
     var aboutWindow, iconLocation;
 
-    iconLocation = "/build/icon.ico";
+    iconLocation = '/build/icon.ico';
 
     if (process.platform === 'linux') {
-        iconLocation = "/build/icon.png";
+
+        iconLocation = '/build/icon.png';
+
     }
 
     aboutWindow = new BrowserWindow({
@@ -43,7 +43,7 @@ function openAboutWindow() {
     });
 
     aboutWindow.setMenu(null);
-    aboutWindow.loadURL("file://" + __dirname + "/about.html");
+    aboutWindow.loadURL(path.join('file://', __dirname, '/about.html'));
 
 }
 
@@ -51,15 +51,21 @@ app.on('ready', function () {
 
     var mainWindow, menuTemplate, menu, windowHeight, iconLocation;
 
-    iconLocation = "/build/icon.ico";
+    iconLocation = '/build/icon.ico';
 
     if (process.platform === 'darwin') {
+
         windowHeight = 212;
+
     } else if (process.platform === 'linux') {
+
         windowHeight = 210;
-        iconLocation = "/build/icon.png";
+        iconLocation = '/build/icon.png';
+
     } else {
+
         windowHeight = 230;
+
     }
 
     mainWindow = new BrowserWindow({
@@ -75,37 +81,45 @@ app.on('ready', function () {
     });
 
     menuTemplate = [{
-        label: "File",
+        label: 'File',
         submenu: [{
-            id: "copyid",
-            label: "Copy Device ID",
-            accelerator: "CommandOrControl+I",
+            id: 'copyid',
+            label: 'Copy Device ID',
+            accelerator: 'CommandOrControl+I',
             click: function () {
-                mainWindow.webContents.send("copyID");
+
+                mainWindow.webContents.send('copyID');
+
             },
             enabled: false
         }, {
             type: 'separator'
         }, {
-            label: "Quit",
-            accelerator: "CommandOrControl+Q",
+            label: 'Quit',
+            accelerator: 'CommandOrControl+Q',
             click: function () {
+
                 app.quit();
+
             }
         }]
     }, {
-        label: "Help",
+        label: 'Help',
         submenu: [{
-            label: "About",
+            label: 'About',
             click: function () {
+
                 openAboutWindow();
+
             }
         }, {
             type: 'separator'
         }, {
-            label: "Open Acoustic Devices Website",
+            label: 'Open Acoustic Devices Website',
             click: function () {
-                shell.openExternal("https://openacousticdevices.info");
+
+                shell.openExternal('https://openacousticdevices.info');
+
             }
         }]
     }];
@@ -114,10 +128,12 @@ app.on('ready', function () {
 
     Menu.setApplicationMenu(menu);
 
-    mainWindow.loadURL("file://" + __dirname + "/index.html");
+    mainWindow.loadURL(path.join('file://', __dirname, '/index.html'));
 
 });
 
 app.on('window-all-closed', function () {
+
     app.quit();
+
 });
