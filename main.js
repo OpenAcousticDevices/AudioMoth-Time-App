@@ -55,16 +55,16 @@ app.on('ready', function () {
 
     if (process.platform === 'darwin') {
 
-        windowHeight = 212;
+        windowHeight = 237;
 
     } else if (process.platform === 'linux') {
 
-        windowHeight = 210;
+        windowHeight = 235;
         iconLocation = '/build/icon.png';
 
     } else {
 
-        windowHeight = 230;
+        windowHeight = 255;
 
     }
 
