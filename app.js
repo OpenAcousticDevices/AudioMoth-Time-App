@@ -8,12 +8,15 @@
 
 /* global document */
 
-var electron = require('electron');
-var clipboard = electron.remote.clipboard;
-var menu = electron.remote.Menu;
+const electron = require('electron');
+const clipboard = electron.remote.clipboard;
+const menu = electron.remote.Menu;
+const dialog = electron.remote.dialog;
 
-var strftime = require('strftime').utc();
-var audiomoth = require('audiomoth-hid');
+const strftime = require('strftime').utc();
+const audiomoth = require('audiomoth-hid');
+
+const versionChecker = require('./versionChecker.js');
 
 /* UI components */
 
@@ -30,6 +33,10 @@ var batteryLabel = document.getElementById('battery-label');
 var batteryDisplay = document.getElementById('battery-display');
 
 var setTimeButton = document.getElementById('set-time-button');
+
+var communicating = false;
+
+var currentTime, deviceId, firmwareVersion, firmwareDescription;
 
 /* Time display functions */
 
@@ -67,11 +74,17 @@ function disableDisplay () {
 
 function enableDisplayAndShowTime (date) {
 
+    if (communicating) {
+
+        return;
+
+    }
+
     var strftimeUTC = strftime.timezone(0);
 
     timeDisplay.textContent = strftimeUTC('%H:%M:%S %d/%m/%Y UTC', date);
 
-    timeDisplay.style.color = 'black';
+    timeDisplay.style.color = '';
 
     setTimeButton.disabled = false;
 
@@ -85,9 +98,9 @@ function enableDisplayAndShowBatteryState (batteryState) {
 
     batteryDisplay.textContent = batteryState;
 
-    batteryDisplay.style.color = 'black';
+    batteryDisplay.style.color = '';
 
-    batteryLabel.style.color = 'black';
+    batteryLabel.style.color = '';
 
 }
 
@@ -95,9 +108,9 @@ function enableDisplayAndShowID (id) {
 
     idDisplay.textContent = id;
 
-    idDisplay.style.color = 'black';
+    idDisplay.style.color = '';
 
-    idLabel.style.color = 'black';
+    idLabel.style.color = '';
 
 }
 
@@ -105,9 +118,9 @@ function enableDisplayAndShowVersionNumber (version) {
 
     firmwareVersionDisplay.textContent = version;
 
-    firmwareVersionDisplay.style.color = 'black';
+    firmwareVersionDisplay.style.color = '';
 
-    firmwareVersionLabel.style.color = 'black';
+    firmwareVersionLabel.style.color = '';
 
 }
 
@@ -115,9 +128,9 @@ function enableDisplayAndShowVersionDescription (description) {
 
     firmwareDescriptionDisplay.textContent = description;
 
-    firmwareDescriptionDisplay.style.color = 'black';
+    firmwareDescriptionDisplay.style.color = '';
 
-    firmwareDescriptionLabel.style.color = 'black';
+    firmwareDescriptionLabel.style.color = '';
 
 }
 
@@ -147,7 +160,9 @@ function requestFirmwareDescription () {
 
         } else {
 
-            enableDisplayAndShowVersionDescription(description);
+            firmwareDescription = description;
+
+            requestFirmwareVersion();
 
         }
 
@@ -169,9 +184,9 @@ function requestFirmwareVersion () {
 
         } else {
 
-            enableDisplayAndShowVersionNumber(versionArr[0] + '.' + versionArr[1] + '.' + versionArr[2]);
+            firmwareVersion = versionArr[0] + '.' + versionArr[1] + '.' + versionArr[2];
 
-            requestFirmwareDescription();
+            requestBatteryState();
 
         }
 
@@ -193,9 +208,11 @@ function requestBatteryState () {
 
         } else {
 
+            enableDisplayAndShowTime(currentTime);
+            enableDisplayAndShowID(deviceId);
+            enableDisplayAndShowVersionDescription(firmwareDescription);
+            enableDisplayAndShowVersionNumber(firmwareVersion);
             enableDisplayAndShowBatteryState(batteryState);
-
-            requestFirmwareVersion();
 
         }
 
@@ -217,9 +234,9 @@ function requestID () {
 
         } else {
 
-            enableDisplayAndShowID(id);
+            deviceId = id;
 
-            requestBatteryState();
+            requestFirmwareDescription();
 
         }
 
@@ -228,6 +245,12 @@ function requestID () {
 }
 
 function requestTime () {
+
+    if (communicating) {
+
+        return;
+
+    }
 
     audiomoth.getTime(function (err, date) {
 
@@ -241,21 +264,21 @@ function requestTime () {
 
         } else {
 
-            enableDisplayAndShowTime(date);
+            currentTime = date;
 
             requestID();
 
         }
 
-        setTimeout(requestTime, 1000);
+        setTimeout(requestTime, 300);
 
     });
 
 }
 
-function setTime () {
+function setTime (time) {
 
-    audiomoth.setTime(new Date(), function (err, date) {
+    audiomoth.setTime(time, function (err, date) {
 
         if (err) {
 
@@ -268,13 +291,6 @@ function setTime () {
         } else {
 
             enableDisplayAndShowTime(date);
-
-            setTimeButton.style.color = 'green';
-            setTimeout(function () {
-
-                setTimeButton.style.color = '';
-
-            }, 1000);
 
         }
 
@@ -295,12 +311,121 @@ electron.ipcRenderer.on('copyID', function () {
 
 });
 
+electron.ipcRenderer.on('update-check', function () {
+
+    versionChecker.checkLatestRelease(function (response) {
+
+        var buttonIndex;
+
+        if (response.error) {
+
+            console.error(response.error);
+
+            dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+                type: 'error',
+                title: 'Failed to check for updates',
+                message: response.error
+            });
+
+            return;
+
+        }
+
+        if (response.updateNeeded === false) {
+
+            dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+                type: 'info',
+                title: 'Update not needed',
+                message: 'Your app is on the latest version (' + response.latestVersion + ').'
+            });
+
+            return;
+
+        }
+
+        buttonIndex = dialog.showMessageBoxSync({
+            type: 'warning',
+            buttons: ['Yes', 'No'],
+            title: 'Are you sure?',
+            message: 'A newer version of this app is available (' + response.latestVersion + '), would you like to download it?'
+        });
+
+        if (buttonIndex === 0) {
+
+            electron.shell.openExternal('https://www.openacousticdevices.info/applications');
+
+        }
+
+    });
+
+});
+
 /* Main code entry point */
 
 disableDisplay();
 
 initialiseDisplay();
 
-setTimeButton.addEventListener('click', setTime);
+setTimeButton.addEventListener('click', function () {
+
+    var sendTime, now, delay, sendTimeDiff, USB_LAG, MINIMUM_DELAY, MILLISECONDS_IN_SECOND;
+
+    communicating = true;
+    timeDisplay.style.color = 'lightgrey';
+
+    USB_LAG = 20;
+
+    MINIMUM_DELAY = 100;
+
+    MILLISECONDS_IN_SECOND = 1000;
+
+    /* Update button */
+
+    setTimeButton.disabled = true;
+
+    setTimeout(function () {
+
+        communicating = false;
+
+        requestTime();
+
+        setTimeButton.disabled = false;
+
+    }, 1500);
+
+    /* Increment to next second transition */
+
+    sendTime = new Date();
+
+    delay = MILLISECONDS_IN_SECOND - sendTime.getMilliseconds() - USB_LAG;
+
+    if (delay < MINIMUM_DELAY) delay += MILLISECONDS_IN_SECOND;
+
+    sendTime.setMilliseconds(sendTime.getMilliseconds() + delay);
+
+    /* Calculate how long to wait until second transition */
+
+    now = new Date();
+    sendTimeDiff = sendTime.getTime() - now.getTime();
+
+    /* Either send immediately or wait until the transition */
+
+    if (sendTimeDiff <= 0) {
+
+        setTime(sendTime);
+
+    } else {
+
+        console.log('Sending in', sendTimeDiff);
+
+        setTimeout(function () {
+
+            setTime(sendTime);
+
+        }, sendTimeDiff);
+
+    }
+
+});
 
 requestTime();
