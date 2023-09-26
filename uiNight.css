@@ -1,0 +1,18 @@
+body {
+    background: #000000;
+    color: #FFFFFF;
+}
+
+input {
+    background: #000000;
+    color: #FFFFFF;
+}
+
+select {
+    background: #000000;
+    color: #FFFFFF;
+}
+
+.grey {
+    color:#808080;
+}

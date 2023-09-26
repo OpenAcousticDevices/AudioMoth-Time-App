@@ -9,34 +9,35 @@
 /* global document */
 
 const electron = require('electron');
-const clipboard = electron.remote.clipboard;
-const menu = electron.remote.Menu;
-const dialog = electron.remote.dialog;
+const {clipboard, Menu, dialog, getCurrentWindow} = require('@electron/remote');
 
 const strftime = require('strftime').utc();
 const audiomoth = require('audiomoth-hid');
 
 const versionChecker = require('./versionChecker.js');
+const nightMode = require('./nightMode.js');
 
 /* UI components */
 
-var applicationMenu = menu.getApplicationMenu();
+const applicationMenu = Menu.getApplicationMenu();
 
-var timeDisplay = document.getElementById('time-display');
-var idLabel = document.getElementById('id-label');
-var idDisplay = document.getElementById('id-display');
-var firmwareVersionLabel = document.getElementById('firmware-version-label');
-var firmwareVersionDisplay = document.getElementById('firmware-version-display');
-var firmwareDescriptionLabel = document.getElementById('firmware-description-label');
-var firmwareDescriptionDisplay = document.getElementById('firmware-description-display');
-var batteryLabel = document.getElementById('battery-label');
-var batteryDisplay = document.getElementById('battery-display');
+const timeDisplay = document.getElementById('time-display');
+const idLabel = document.getElementById('id-label');
+const idDisplay = document.getElementById('id-display');
+const firmwareVersionLabel = document.getElementById('firmware-version-label');
+const firmwareVersionDisplay = document.getElementById('firmware-version-display');
+const firmwareDescriptionLabel = document.getElementById('firmware-description-label');
+const firmwareDescriptionDisplay = document.getElementById('firmware-description-display');
+const batteryLabel = document.getElementById('battery-label');
+const batteryDisplay = document.getElementById('battery-display');
 
-var setTimeButton = document.getElementById('set-time-button');
+const setTimeButton = document.getElementById('set-time-button');
 
-var communicating = false;
+const MILLISECONDS_IN_SECOND = 1000;
 
-var currentTime, deviceId, firmwareVersion, firmwareDescription;
+let communicating = false;
+
+let currentTime, deviceId, firmwareVersion, firmwareDescription;
 
 /* Time display functions */
 
@@ -80,7 +81,7 @@ function enableDisplayAndShowTime (date) {
 
     }
 
-    var strftimeUTC = strftime.timezone(0);
+    const strftimeUTC = strftime.timezone(0);
 
     timeDisplay.textContent = strftimeUTC('%H:%M:%S %d/%m/%Y UTC', date);
 
@@ -150,6 +151,8 @@ function requestFirmwareDescription () {
 
     audiomoth.getFirmwareDescription(function (err, description) {
 
+        if (communicating) return;
+
         if (err) {
 
             errorOccurred(err);
@@ -174,6 +177,8 @@ function requestFirmwareVersion () {
 
     audiomoth.getFirmwareVersion(function (err, versionArr) {
 
+        if (communicating) return;
+
         if (err) {
 
             errorOccurred(err);
@@ -197,6 +202,8 @@ function requestFirmwareVersion () {
 function requestBatteryState () {
 
     audiomoth.getBatteryState(function (err, batteryState) {
+
+        if (communicating) return;
 
         if (err) {
 
@@ -224,6 +231,8 @@ function requestID () {
 
     audiomoth.getID(function (err, id) {
 
+        if (communicating) return;
+
         if (err) {
 
             errorOccurred(err);
@@ -246,13 +255,11 @@ function requestID () {
 
 function requestTime () {
 
-    if (communicating) {
-
-        return;
-
-    }
+    if (communicating) return;
 
     audiomoth.getTime(function (err, date) {
+
+        if (communicating) return;
 
         if (err) {
 
@@ -270,9 +277,15 @@ function requestTime () {
 
         }
 
-        setTimeout(requestTime, 300);
-
     });
+
+    const milliseconds = Date.now() % MILLISECONDS_IN_SECOND;
+
+    let delay = MILLISECONDS_IN_SECOND / 2 - milliseconds;
+
+    if (delay < 0) delay += MILLISECONDS_IN_SECOND;
+
+    setTimeout(requestTime, delay);
 
 }
 
@@ -315,13 +328,11 @@ electron.ipcRenderer.on('update-check', function () {
 
     versionChecker.checkLatestRelease(function (response) {
 
-        var buttonIndex;
-
         if (response.error) {
 
             console.error(response.error);
 
-            dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+            dialog.showMessageBox(getCurrentWindow(), {
                 type: 'error',
                 title: 'Failed to check for updates',
                 message: response.error
@@ -333,7 +344,7 @@ electron.ipcRenderer.on('update-check', function () {
 
         if (response.updateNeeded === false) {
 
-            dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+            dialog.showMessageBox(getCurrentWindow(), {
                 type: 'info',
                 title: 'Update not needed',
                 message: 'Your app is on the latest version (' + response.latestVersion + ').'
@@ -343,7 +354,7 @@ electron.ipcRenderer.on('update-check', function () {
 
         }
 
-        buttonIndex = dialog.showMessageBoxSync({
+        const buttonIndex = dialog.showMessageBoxSync({
             type: 'warning',
             buttons: ['Yes', 'No'],
             title: 'Are you sure?',
@@ -368,16 +379,15 @@ initialiseDisplay();
 
 setTimeButton.addEventListener('click', function () {
 
-    var sendTime, now, delay, sendTimeDiff, USB_LAG, MINIMUM_DELAY, MILLISECONDS_IN_SECOND;
-
     communicating = true;
+
     timeDisplay.style.color = 'lightgrey';
 
-    USB_LAG = 20;
+    const USB_LAG = 20;
 
-    MINIMUM_DELAY = 100;
+    const MINIMUM_DELAY = 100;
 
-    MILLISECONDS_IN_SECOND = 1000;
+    const MILLISECONDS_IN_SECOND = 1000;
 
     /* Update button */
 
@@ -395,9 +405,9 @@ setTimeButton.addEventListener('click', function () {
 
     /* Increment to next second transition */
 
-    sendTime = new Date();
+    const sendTime = new Date();
 
-    delay = MILLISECONDS_IN_SECOND - sendTime.getMilliseconds() - USB_LAG;
+    let delay = MILLISECONDS_IN_SECOND - sendTime.getMilliseconds() - USB_LAG;
 
     if (delay < MINIMUM_DELAY) delay += MILLISECONDS_IN_SECOND;
 
@@ -405,8 +415,8 @@ setTimeButton.addEventListener('click', function () {
 
     /* Calculate how long to wait until second transition */
 
-    now = new Date();
-    sendTimeDiff = sendTime.getTime() - now.getTime();
+    const now = new Date();
+    const sendTimeDiff = sendTime.getTime() - now.getTime();
 
     /* Either send immediately or wait until the transition */
 
@@ -423,6 +433,20 @@ setTimeButton.addEventListener('click', function () {
             setTime(sendTime);
 
         }, sendTimeDiff);
+
+    }
+
+});
+
+electron.ipcRenderer.on('night-mode', (e, nm) => {
+
+    if (nm !== undefined) {
+
+        nightMode.setNightMode(nm);
+
+    } else {
+
+        nightMode.toggle();
 
     }
 

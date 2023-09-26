@@ -6,24 +6,21 @@
 
 'use strict';
 
-var electron = require('electron');
-var app = electron.app;
+const {app, Menu, shell, ipcMain, BrowserWindow} = require('electron');
 
-var BrowserWindow = electron.BrowserWindow;
-var Menu = electron.Menu;
-var shell = electron.shell;
+require('@electron/remote/main').initialize();
+
+let mainWindow, aboutWindow;
 
 require('electron-debug')({
     showDevTools: 'undocked'
 });
 
-var path = require('path');
+const path = require('path');
 
 function openAboutWindow () {
 
-    var aboutWindow, iconLocation;
-
-    iconLocation = '/build/icon.ico';
+    let iconLocation = '/build/icon.ico';
 
     if (process.platform === 'linux') {
 
@@ -34,24 +31,64 @@ function openAboutWindow () {
     aboutWindow = new BrowserWindow({
         width: 400,
         height: 325,
+        title: 'About AudioMoth Time App',
         resizable: false,
         fullscreenable: false,
         icon: path.join(__dirname, iconLocation),
+        parent: mainWindow,
         webPreferences: {
-            nodeIntegration: true
+            enableRemoteModule: true,
+            nodeIntegration: true,
+            contextIsolation: false
         }
     });
 
     aboutWindow.setMenu(null);
     aboutWindow.loadURL(path.join('file://', __dirname, '/about.html'));
 
+    require('@electron/remote/main').enable(aboutWindow.webContents);
+
+    aboutWindow.on('closed', () => {
+
+        aboutWindow = null;
+
+    });
+
+    aboutWindow.webContents.on('dom-ready', function () {
+
+        mainWindow.webContents.send('poll-night-mode');
+
+    });
+
+    ipcMain.on('night-mode-poll-reply', (e, nightMode) => {
+
+        if (aboutWindow) {
+
+            aboutWindow.webContents.send('night-mode', nightMode);
+
+        }
+
+    });
+
+}
+
+function toggleNightMode () {
+
+    mainWindow.webContents.send('night-mode');
+
+    if (aboutWindow) {
+
+        aboutWindow.webContents.send('night-mode');
+
+    }
+
 }
 
 app.on('ready', function () {
 
-    var mainWindow, menuTemplate, menu, windowHeight, iconLocation;
+    let iconLocation = '/build/icon.ico';
 
-    iconLocation = '/build/icon.ico';
+    let windowHeight = 250;
 
     if (process.platform === 'darwin') {
 
@@ -62,27 +99,35 @@ app.on('ready', function () {
         windowHeight = 230;
         iconLocation = '/build/icon.png';
 
-    } else {
-
-        windowHeight = 250;
-
     }
 
     mainWindow = new BrowserWindow({
         width: 565,
         height: windowHeight,
         useContentSize: true,
+        title: 'AudioMoth Time App',
         resizable: false,
         fullscreenable: false,
         icon: path.join(__dirname, iconLocation),
         webPreferences: {
-            nodeIntegration: true
+            enableRemoteModule: true,
+            nodeIntegration: true,
+            contextIsolation: false
         }
     });
 
-    menuTemplate = [{
+    require('@electron/remote/main').enable(mainWindow.webContents);
+
+    const menuTemplate = [{
         label: 'File',
         submenu: [{
+            type: 'checkbox',
+            id: 'nightmode',
+            label: 'Night Mode',
+            accelerator: 'CommandOrControl+N',
+            checked: false,
+            click: toggleNightMode
+        }, {
             id: 'copyid',
             label: 'Copy Device ID',
             accelerator: 'CommandOrControl+I',
@@ -131,7 +176,7 @@ app.on('ready', function () {
         }]
     }];
 
-    menu = Menu.buildFromTemplate(menuTemplate);
+    const menu = Menu.buildFromTemplate(menuTemplate);
 
     Menu.setApplicationMenu(menu);
 

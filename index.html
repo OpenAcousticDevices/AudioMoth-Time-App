@@ -3,17 +3,17 @@
 
     <head>
         <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-        <title>AudioMoth Time App</title>
+        <link id="uiCSS" rel="stylesheet" href="ui.css">
     </head>
 
-    <body style="background: #FFFFFF; font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
-        <div class="container" style="padding: 11px;">
+    <body style="font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
+        <div class="container" style="padding: 8px;">
 
             <div class="row">
                 <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
                     <div class="row" style="margin-left: 0px;">
                         <div class="col-12" style="text-align: center; padding-top: 5px; padding-bottom: 5px">
-                            <span style="font-size: 25px; font-family: &apos;Lucida Console&apos;, Monaco, monospace">
+                            <span class="mono-text" style="font-size: 25px; font-family: &apos;Lucida Console&apos;, Monaco">
                                 <div id="time-display" style="display: inline-block; color: lightgray;"></div>
                             </span>
                         </div>
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div class="row" style="margin-top: 8px;">
-                <div style="text-align: center; margin-left: 15px; width: 543px;">
+                <div style="text-align: center; margin-left: 15px; width: 543px; padding: 0px;">
                     <button id="set-time-button" class="btn btn-success" style="width: 100%;" disabled>Set Time</button>
                 </div>
             </div>
