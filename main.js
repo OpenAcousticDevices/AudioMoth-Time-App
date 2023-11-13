@@ -13,27 +13,48 @@ require('@electron/remote/main').initialize();
 let mainWindow, aboutWindow;
 
 require('electron-debug')({
-    showDevTools: 'undocked'
+    showDevTools: true,
+    devToolsMode: 'undocked'
 });
 
 const path = require('path');
 
 function openAboutWindow () {
 
+    if (aboutWindow) {
+
+        aboutWindow.show();
+        return;
+
+    }
+
     let iconLocation = '/build/icon.ico';
+
+    let windowWidth = 400;
+    let windowHeight = 310;
 
     if (process.platform === 'linux') {
 
+        windowWidth = 395;
+        windowHeight = 310;
+
         iconLocation = '/build/icon.png';
+
+    } else if (process.platform === 'darwin') {
+
+        windowWidth = 395;
+        windowHeight = 303;
 
     }
 
     aboutWindow = new BrowserWindow({
-        width: 400,
-        height: 325,
+        width: windowWidth,
+        height: windowHeight,
         title: 'About AudioMoth Time App',
         resizable: false,
         fullscreenable: false,
+        useContentSize: true,
+        autoHideMenuBar: true,
         icon: path.join(__dirname, iconLocation),
         parent: mainWindow,
         webPreferences: {
@@ -48,9 +69,11 @@ function openAboutWindow () {
 
     require('@electron/remote/main').enable(aboutWindow.webContents);
 
-    aboutWindow.on('closed', () => {
+    aboutWindow.on('close', (e) => {
 
-        aboutWindow = null;
+        e.preventDefault();
+
+        aboutWindow.hide();
 
     });
 
@@ -86,28 +109,30 @@ function toggleNightMode () {
 
 app.on('ready', function () {
 
-    let iconLocation = '/build/icon.ico';
+    const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
 
-    let windowHeight = 250;
+    let windowWidth = 565;
+    let windowHeight = 243;
 
     if (process.platform === 'darwin') {
 
-        windowHeight = 227;
+        windowWidth = 560;
+        windowHeight = 223;
 
     } else if (process.platform === 'linux') {
 
-        windowHeight = 230;
-        iconLocation = '/build/icon.png';
+        windowWidth = 560;
+        windowHeight = 223;
 
     }
 
     mainWindow = new BrowserWindow({
-        width: 565,
+        width: windowWidth,
         height: windowHeight,
-        useContentSize: true,
         title: 'AudioMoth Time App',
         resizable: false,
         fullscreenable: false,
+        useContentSize: true,
         icon: path.join(__dirname, iconLocation),
         webPreferences: {
             enableRemoteModule: true,

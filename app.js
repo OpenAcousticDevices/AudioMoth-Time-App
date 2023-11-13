@@ -43,33 +43,31 @@ let currentTime, deviceId, firmwareVersion, firmwareDescription;
 
 function initialiseDisplay () {
 
-    timeDisplay.textContent = '00:00:00 01/01/1970 UTC';
+    timeDisplay.textContent = '--:--:-- --/--/---- UTC';
 
 }
 
 function disableDisplay () {
 
-    timeDisplay.style.color = 'lightgrey';
+    timeDisplay.classList.add('grey');
 
-    idDisplay.style.color = 'lightgrey';
+    idDisplay.classList.add('grey');
 
-    idLabel.style.color = 'lightgrey';
+    idLabel.classList.add('grey');
 
-    firmwareVersionDisplay.style.color = 'lightgrey';
+    firmwareVersionDisplay.classList.add('grey');
 
-    firmwareVersionLabel.style.color = 'lightgrey';
+    firmwareVersionLabel.classList.add('grey');
 
-    firmwareDescriptionDisplay.style.color = 'lightgrey';
+    firmwareDescriptionDisplay.classList.add('grey');
 
-    firmwareDescriptionLabel.style.color = 'lightgrey';
+    firmwareDescriptionLabel.classList.add('grey');
 
-    batteryDisplay.style.color = 'lightgrey';
+    batteryDisplay.classList.add('grey');
 
-    batteryLabel.style.color = 'lightgrey';
+    batteryLabel.classList.add('grey');
 
     setTimeButton.disabled = true;
-
-    applicationMenu.getMenuItemById('copyid').enabled = false;
 
 }
 
@@ -85,7 +83,7 @@ function enableDisplayAndShowTime (date) {
 
     timeDisplay.textContent = strftimeUTC('%H:%M:%S %d/%m/%Y UTC', date);
 
-    timeDisplay.style.color = '';
+    timeDisplay.classList.remove('grey');
 
     setTimeButton.disabled = false;
 
@@ -99,9 +97,9 @@ function enableDisplayAndShowBatteryState (batteryState) {
 
     batteryDisplay.textContent = batteryState;
 
-    batteryDisplay.style.color = '';
+    batteryDisplay.classList.remove('grey');
 
-    batteryLabel.style.color = '';
+    batteryLabel.classList.remove('grey');
 
 }
 
@@ -109,9 +107,9 @@ function enableDisplayAndShowID (id) {
 
     idDisplay.textContent = id;
 
-    idDisplay.style.color = '';
+    idDisplay.classList.remove('grey');
 
-    idLabel.style.color = '';
+    idLabel.classList.remove('grey');
 
 }
 
@@ -119,9 +117,9 @@ function enableDisplayAndShowVersionNumber (version) {
 
     firmwareVersionDisplay.textContent = version;
 
-    firmwareVersionDisplay.style.color = '';
+    firmwareVersionDisplay.classList.remove('grey');
 
-    firmwareVersionLabel.style.color = '';
+    firmwareVersionLabel.classList.remove('grey');
 
 }
 
@@ -129,9 +127,9 @@ function enableDisplayAndShowVersionDescription (description) {
 
     firmwareDescriptionDisplay.textContent = description;
 
-    firmwareDescriptionDisplay.style.color = '';
+    firmwareDescriptionDisplay.classList.remove('grey');
 
-    firmwareDescriptionLabel.style.color = '';
+    firmwareDescriptionLabel.classList.remove('grey');
 
 }
 
@@ -311,16 +309,16 @@ function setTime (time) {
 
 }
 
-electron.ipcRenderer.on('copyID', function () {
+electron.ipcRenderer.on('copyID', () => {
 
     clipboard.writeText(idDisplay.textContent);
     idDisplay.style.color = 'green';
 
-    setTimeout(function () {
+    setTimeout(() => {
 
         idDisplay.style.color = '';
 
-    }, 5000);
+    }, 2000);
 
 });
 
@@ -381,7 +379,7 @@ setTimeButton.addEventListener('click', function () {
 
     communicating = true;
 
-    timeDisplay.style.color = 'lightgrey';
+    timeDisplay.classList.add('grey');
 
     const USB_LAG = 20;
 
@@ -449,6 +447,12 @@ electron.ipcRenderer.on('night-mode', (e, nm) => {
         nightMode.toggle();
 
     }
+
+});
+
+electron.ipcRenderer.on('poll-night-mode', () => {
+
+    electron.ipcRenderer.send('night-mode-poll-reply', nightMode.isEnabled());
 
 });
 

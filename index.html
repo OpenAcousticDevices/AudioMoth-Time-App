@@ -3,66 +3,80 @@
 
     <head>
         <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="index.css">
         <link id="uiCSS" rel="stylesheet" href="ui.css">
     </head>
 
-    <body style="font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
-        <div class="container" style="padding: 8px;">
+    <body style="font-size: 10pt; overflow:hidden; font-family: Helvetica, Arial, sans-serif; -webkit-user-select: none; -webkit-app-region: drag;">
+
+        <div class="container">
 
             <div class="row">
-                <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
-                    <div class="row" style="margin-left: 0px;">
-                        <div class="col-12" style="text-align: center; padding-top: 5px; padding-bottom: 5px">
-                            <span class="mono-text" style="font-size: 25px; font-family: &apos;Lucida Console&apos;, Monaco">
-                                <div id="time-display" style="display: inline-block; color: lightgray;"></div>
-                            </span>
-                        </div>
+                <div class="col-12" style="text-align: center; padding: 8px;">
+                    <div class="groupBorder">
+                        <span>
+                            <div class="mono-text" id="time-display" class="grey">--:--:-- --/--/---- UTC</div>
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 8px;">
-                <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
-                    <div class="row" style="margin-top: 5px;">
-                        <div class="col-6" style="text-align: left;">
-                            <span id="id-label" style="margin-left: 20px; color: lightgray;">Device ID:</span>
+            <div class="row">
+
+                <div class="col-12" style="padding: 8px; padding-top: 0px;">
+
+                    <div class="groupBorder">
+
+                        <div class="row" style="margin-bottom: 3px;">
+                            <div class="col-6" style="text-align: left;">
+                                <span id="id-label" class="grey leftElement">Device ID:</span>
+                            </div>
+                            <div class="col-6" style="text-align: right;">
+                                <span id="id-display" style="border: none;" class="grey rightElement">-</span>
+                            </div>
                         </div>
-                        <div class="col-6" style="text-align: right;">
-                            <span id="id-display" style="margin-right: 20px; border: none; text-align: right; color: lightgray;">-</span>
+
+                        <div class="row" style="margin-bottom: 3px;">
+                            <div class="col-6" style="text-align: left;">
+                                <span id="firmware-description-label" class="grey leftElement">Firmware description:</span>
+                            </div>
+                            <div class="col-6" style="text-align: right;">
+                                <span id="firmware-description-display" style="border: none;" class="grey rightElement">-</span>
+                            </div>
                         </div>
+
+                        <div class="row" style="margin-bottom: 3px;">
+                            <div class="col-6" style="text-align: left;">
+                                <span id="firmware-version-label" class="grey leftElement">Firmware version:</span>
+                            </div>
+                            <div class="col-6" style="text-align: right;">
+                                <span id="firmware-version-display" style="border: none;" class="grey rightElement">-</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6" style="text-align: left;">
+                                <span id="battery-label" class="grey leftElement">Battery:</span>
+                            </div>
+                            <div class="col-6" style="text-align: right;">
+                                <span id="battery-display" style="border: none;" class="grey rightElement">-</span>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="row" style="margin-top: 5px;">
-                        <div class="col-6" style="text-align: left;">
-                            <span id="firmware-description-label" style="margin-left: 20px; color: lightgray;">Firmware description:</span>
-                        </div>
-                        <div class="col-6" style="text-align: right;">
-                            <span id="firmware-description-display" style="margin-right: 20px; color: lightgray;">-</span>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 5px;">
-                        <div class="col-6" style="text-align: left;">
-                            <span id="firmware-version-label" style="margin-left: 20px; color: lightgray;">Firmware version:</span>
-                        </div>
-                        <div class="col-6" style="text-align: right;">
-                            <span id="firmware-version-display" style="margin-right: 20px; color: lightgray;">-</span>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 5px; margin-bottom: 5px;">
-                        <div class="col-6" style="text-align: left;">
-                            <span id="battery-label" style="margin-left: 20px; color: lightgray;">Battery:</span>
-                        </div>
-                        <div class="col-6" style="text-align: right;">
-                            <span id="battery-display" style="margin-right: 20px; color: lightgray;">-</span>
-                        </div>
-                    </div>
+
                 </div>
+
             </div>
-            <div class="row" style="margin-top: 8px;">
-                <div style="text-align: center; margin-left: 15px; width: 543px; padding: 0px;">
+
+            <div class="row">
+                <div style="text-align: center; padding: 8px; padding-top: 0px;">
                     <button id="set-time-button" class="btn btn-success" style="width: 100%;" disabled>Set Time</button>
                 </div>
             </div>
+
         </div>
+
     </body>
 
     <script src="app.js" charset="utf-8"></script>
