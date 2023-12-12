@@ -11,11 +11,13 @@
 const electron = require('electron');
 const {clipboard, Menu, dialog, getCurrentWindow} = require('@electron/remote');
 
+const util = require('util');
 const strftime = require('strftime').utc();
 const audiomoth = require('audiomoth-hid');
 
 const versionChecker = require('./versionChecker.js');
 const nightMode = require('./nightMode.js');
+require('worker_threads');
 
 /* UI components */
 
@@ -35,9 +37,14 @@ const setTimeButton = document.getElementById('set-time-button');
 
 const MILLISECONDS_IN_SECOND = 1000;
 
+/* Whether or not communication with device is currently happening */
+
 let communicating = false;
 
-let currentTime, deviceId, firmwareVersion, firmwareDescription;
+/* Communication constants */
+
+const MAXIMUM_RETRIES = 10;
+const DEFAULT_RETRY_INTERVAL = 100;
 
 /* Time display functions */
 
@@ -73,11 +80,7 @@ function disableDisplay () {
 
 function enableDisplayAndShowTime (date) {
 
-    if (communicating) {
-
-        return;
-
-    }
+    if (communicating) return;
 
     const strftimeUTC = strftime.timezone(0);
 
@@ -86,8 +89,6 @@ function enableDisplayAndShowTime (date) {
     timeDisplay.classList.remove('grey');
 
     setTimeButton.disabled = false;
-
-    applicationMenu.getMenuItemById('copyid').enabled = true;
 
 }
 
@@ -111,6 +112,8 @@ function enableDisplayAndShowID (id) {
 
     idLabel.classList.remove('grey');
 
+    applicationMenu.getMenuItemById('copyid').enabled = true;
+
 }
 
 function enableDisplayAndShowVersionNumber (version) {
@@ -133,149 +136,105 @@ function enableDisplayAndShowVersionDescription (description) {
 
 }
 
-/* Error response */
+/* Utility functions */
 
-function errorOccurred (err) {
+async function callWithRetry (funcSync, argument, milliseconds, repeats) {
 
-    console.error(err);
+    let result;
 
-    disableDisplay();
+    let attempt = 0;
+
+    while (attempt < repeats) {
+
+        try {
+
+            if (argument) {
+
+                result = await funcSync(argument);
+
+            } else {
+
+                result = await funcSync();
+
+            }
+
+            break;
+
+        } catch (e) {
+
+            const interval = milliseconds / 2 + milliseconds / 2 * Math.random();
+
+            await delay(interval);
+
+            attempt += 1;
+
+        }
+
+    }
+
+    if (result === undefined) throw ('Error: Repeated attempts to access the device failed.');
+
+    if (result === null) throw ('No device detected');
+
+    return result;
 
 }
+
+async function delay (milliseconds) {
+
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+
+}
+
+/* Promisified versions of AudioMoth-HID calls */
+
+const getFirmwareDescription = util.promisify(audiomoth.getFirmwareDescription);
+
+const getFirmwareVersion = util.promisify(audiomoth.getFirmwareVersion);
+
+const getBatteryState = util.promisify(audiomoth.getBatteryState);
+
+const getID = util.promisify(audiomoth.getID);
+
+const getTime = util.promisify(audiomoth.getTime);
+
+const setTime = util.promisify(audiomoth.setTime);
 
 /* Device interaction functions */
 
-function requestFirmwareDescription () {
+async function requestAudioMothTime () {
 
-    audiomoth.getFirmwareDescription(function (err, description) {
+    try {
 
-        if (communicating) return;
+        /* Read from AudioMoth */
 
-        if (err) {
+        const date = await callWithRetry(getTime, null, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-            errorOccurred(err);
+        const id = await callWithRetry(getID, null, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-        } else if (description === null) {
+        const description = await callWithRetry(getFirmwareDescription, null, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-            disableDisplay();
+        const versionArr = await callWithRetry(getFirmwareVersion, null, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-        } else {
+        const batteryState = await callWithRetry(getBatteryState, null, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-            firmwareDescription = description;
+        /* No exceptions have occurred so update display */
 
-            requestFirmwareVersion();
+        const firmwareVersion = versionArr[0] + '.' + versionArr[1] + '.' + versionArr[2];
 
-        }
+        enableDisplayAndShowTime(date);
+        enableDisplayAndShowID(id);
+        enableDisplayAndShowVersionDescription(description);
+        enableDisplayAndShowVersionNumber(firmwareVersion);
+        enableDisplayAndShowBatteryState(batteryState);
 
-    });
+    } catch (e) {
 
-}
+        /* Problem reading from AudioMoth or no AudioMoth */
 
-function requestFirmwareVersion () {
+        disableDisplay();
 
-    audiomoth.getFirmwareVersion(function (err, versionArr) {
-
-        if (communicating) return;
-
-        if (err) {
-
-            errorOccurred(err);
-
-        } else if (versionArr === null) {
-
-            disableDisplay();
-
-        } else {
-
-            firmwareVersion = versionArr[0] + '.' + versionArr[1] + '.' + versionArr[2];
-
-            requestBatteryState();
-
-        }
-
-    });
-
-}
-
-function requestBatteryState () {
-
-    audiomoth.getBatteryState(function (err, batteryState) {
-
-        if (communicating) return;
-
-        if (err) {
-
-            errorOccurred(err);
-
-        } else if (batteryState === null) {
-
-            disableDisplay();
-
-        } else {
-
-            enableDisplayAndShowTime(currentTime);
-            enableDisplayAndShowID(deviceId);
-            enableDisplayAndShowVersionDescription(firmwareDescription);
-            enableDisplayAndShowVersionNumber(firmwareVersion);
-            enableDisplayAndShowBatteryState(batteryState);
-
-        }
-
-    });
-
-}
-
-function requestID () {
-
-    audiomoth.getID(function (err, id) {
-
-        if (communicating) return;
-
-        if (err) {
-
-            errorOccurred(err);
-
-        } else if (id === null) {
-
-            disableDisplay();
-
-        } else {
-
-            deviceId = id;
-
-            requestFirmwareDescription();
-
-        }
-
-    });
-
-}
-
-function requestTime () {
-
-    if (communicating) return;
-
-    audiomoth.getTime(function (err, date) {
-
-        if (communicating) return;
-
-        if (err) {
-
-            errorOccurred(err);
-
-        } else if (date === null) {
-
-            disableDisplay();
-
-        } else {
-
-            currentTime = date;
-
-            requestID();
-
-        }
-
-    });
+    }
 
     const milliseconds = Date.now() % MILLISECONDS_IN_SECOND;
 
@@ -283,29 +242,21 @@ function requestTime () {
 
     if (delay < 0) delay += MILLISECONDS_IN_SECOND;
 
-    setTimeout(requestTime, delay);
+    setTimeout(requestAudioMothTime, delay);
 
 }
 
-function setTime (time) {
+async function setAudioMothTime (time) {
 
-    audiomoth.setTime(time, function (err, date) {
+    try {
 
-        if (err) {
+        await callWithRetry(setTime, time, DEFAULT_RETRY_INTERVAL, MAXIMUM_RETRIES);
 
-            errorOccurred(err);
+    } catch (e) {
 
-        } else if (date === null) {
+        disableDisplay();
 
-            disableDisplay();
-
-        } else {
-
-            enableDisplayAndShowTime(date);
-
-        }
-
-    });
+    }
 
 }
 
@@ -377,8 +328,6 @@ initialiseDisplay();
 
 setTimeButton.addEventListener('click', function () {
 
-    communicating = true;
-
     timeDisplay.classList.add('grey');
 
     const USB_LAG = 20;
@@ -386,20 +335,6 @@ setTimeButton.addEventListener('click', function () {
     const MINIMUM_DELAY = 100;
 
     const MILLISECONDS_IN_SECOND = 1000;
-
-    /* Update button */
-
-    setTimeButton.disabled = true;
-
-    setTimeout(function () {
-
-        communicating = false;
-
-        requestTime();
-
-        setTimeButton.disabled = false;
-
-    }, 1500);
 
     /* Increment to next second transition */
 
@@ -414,13 +349,30 @@ setTimeButton.addEventListener('click', function () {
     /* Calculate how long to wait until second transition */
 
     const now = new Date();
+
     const sendTimeDiff = sendTime.getTime() - now.getTime();
+
+    /* Calculate when to re-enable time display */
+
+    communicating = true;
+
+    setTimeButton.disabled = true;
+
+    const updateDelay = sendTimeDiff <= 0 ? MILLISECONDS_IN_SECOND : sendTimeDiff;
+
+    setTimeout(function () {
+
+        communicating = false;
+
+    }, updateDelay);
 
     /* Either send immediately or wait until the transition */
 
     if (sendTimeDiff <= 0) {
 
-        setTime(sendTime);
+        console.log('Sending...');
+
+        setAudioMothTime(sendTime);
 
     } else {
 
@@ -428,7 +380,7 @@ setTimeButton.addEventListener('click', function () {
 
         setTimeout(function () {
 
-            setTime(sendTime);
+            setAudioMothTime(sendTime);
 
         }, sendTimeDiff);
 
@@ -456,4 +408,4 @@ electron.ipcRenderer.on('poll-night-mode', () => {
 
 });
 
-requestTime();
+requestAudioMothTime();

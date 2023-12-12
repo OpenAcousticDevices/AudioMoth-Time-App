@@ -43,7 +43,7 @@ function openAboutWindow () {
     } else if (process.platform === 'darwin') {
 
         windowWidth = 395;
-        windowHeight = 303;
+        windowHeight = 310;
 
     }
 
