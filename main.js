@@ -53,6 +53,7 @@ function openAboutWindow () {
         title: 'About AudioMoth Time App',
         resizable: false,
         fullscreenable: false,
+        minimizable: false,
         useContentSize: true,
         autoHideMenuBar: true,
         icon: path.join(__dirname, iconLocation),

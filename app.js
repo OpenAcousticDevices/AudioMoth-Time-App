@@ -45,6 +45,7 @@ let communicating = false;
 
 const MAXIMUM_RETRIES = 10;
 const DEFAULT_RETRY_INTERVAL = 100;
+const DEFAULT_REQUEST_OFFSET = 100;
 
 /* Time display functions */
 
@@ -238,7 +239,7 @@ async function requestAudioMothTime () {
 
     const milliseconds = Date.now() % MILLISECONDS_IN_SECOND;
 
-    let delay = MILLISECONDS_IN_SECOND / 2 - milliseconds;
+    let delay = DEFAULT_REQUEST_OFFSET - milliseconds;
 
     if (delay < 0) delay += MILLISECONDS_IN_SECOND;
 
@@ -340,7 +341,7 @@ setTimeButton.addEventListener('click', function () {
 
     const sendTime = new Date();
 
-    let delay = MILLISECONDS_IN_SECOND - sendTime.getMilliseconds() - USB_LAG;
+    let delay = MILLISECONDS_IN_SECOND - sendTime.getMilliseconds();
 
     if (delay < MINIMUM_DELAY) delay += MILLISECONDS_IN_SECOND;
 
@@ -350,7 +351,7 @@ setTimeButton.addEventListener('click', function () {
 
     const now = new Date();
 
-    const sendTimeDiff = sendTime.getTime() - now.getTime();
+    const sendTimeDiff = sendTime.getTime() - now.getTime() - USB_LAG;
 
     /* Calculate when to re-enable time display */
 
@@ -358,7 +359,7 @@ setTimeButton.addEventListener('click', function () {
 
     setTimeButton.disabled = true;
 
-    const updateDelay = sendTimeDiff <= 0 ? MILLISECONDS_IN_SECOND : sendTimeDiff;
+    const updateDelay = sendTimeDiff <= 0 ? MILLISECONDS_IN_SECOND / 2: sendTimeDiff + MILLISECONDS_IN_SECOND / 2;
 
     setTimeout(function () {
 
@@ -370,13 +371,13 @@ setTimeButton.addEventListener('click', function () {
 
     if (sendTimeDiff <= 0) {
 
-        console.log('Sending...');
+        console.log('Sending now.');
 
         setAudioMothTime(sendTime);
 
     } else {
 
-        console.log('Sending in', sendTimeDiff);
+        console.log('Sending in', sendTimeDiff,'ms.');
 
         setTimeout(function () {
 
