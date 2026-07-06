@@ -6,16 +6,16 @@
 
 'use strict';
 
+/* global process, __dirname */
+
 const {app, Menu, shell, ipcMain, BrowserWindow} = require('electron');
 
-require('@electron/remote/main').initialize();
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
+
+const electronDebug = require('electron-debug');
 
 let mainWindow, aboutWindow;
-
-require('electron-debug')({
-    showDevTools: true,
-    devToolsMode: 'undocked'
-});
 
 const path = require('path');
 
@@ -59,16 +59,22 @@ function openAboutWindow () {
         icon: path.join(__dirname, iconLocation),
         parent: mainWindow,
         webPreferences: {
-            enableRemoteModule: true,
+            contextIsolation: false,
             nodeIntegration: true,
-            contextIsolation: false
+            sandbox: false
         }
     });
 
+    aboutWindow.loadFile('about.html');
     aboutWindow.setMenu(null);
-    aboutWindow.loadURL(path.join('file://', __dirname, '/about.html'));
 
     require('@electron/remote/main').enable(aboutWindow.webContents);
+
+    if (!app.isPackaged) {
+
+        electronDebug.openDevTools(aboutWindow);
+
+    }
 
     aboutWindow.on('close', (e) => {
 
@@ -113,12 +119,12 @@ app.on('ready', function () {
     const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
 
     let windowWidth = 565;
-    let windowHeight = 243;
+    let windowHeight = 195;
 
     if (process.platform === 'darwin') {
 
         windowWidth = 560;
-        windowHeight = 223;
+        windowHeight = 255;
 
     } else if (process.platform === 'linux') {
 
@@ -138,9 +144,13 @@ app.on('ready', function () {
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            backgroundThrottling: false
         }
     });
+
+    // TODO: This line fixes this issue: https://github.com/electron/electron/issues/51465 Check to see if still broken
+    mainWindow.setSize(windowWidth, windowHeight);
 
     require('@electron/remote/main').enable(mainWindow.webContents);
 
@@ -206,7 +216,13 @@ app.on('ready', function () {
 
     Menu.setApplicationMenu(menu);
 
-    mainWindow.loadURL(path.join('file://', __dirname, '/index.html'));
+    mainWindow.loadFile('index.html');
+
+    if (!app.isPackaged) {
+
+        electronDebug.openDevTools(mainWindow);
+
+    }
 
 });
 

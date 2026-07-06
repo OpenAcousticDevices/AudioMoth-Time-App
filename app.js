@@ -6,8 +6,6 @@
 
 'use strict';
 
-/* global document */
-
 const electron = require('electron');
 const {clipboard, Menu, dialog, getCurrentWindow} = require('@electron/remote');
 
