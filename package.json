@@ -1,6 +1,6 @@
 {
   "name": "AudioMoth-Time",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "The time app for the AudioMoth acoustic acoustic monitoring device.",
   "main": "main.js",
   "author": "openacousticdevices.info <theteam@openacousticdevices.info>",
@@ -12,8 +12,9 @@
   "scripts": {
     "postinstall": "install-app-deps && node scripts/install-electron-binary.js",
     "start": "electron .",
-    "dist": "node builder.js",
-    "install-electron-binary": "node scripts/install-electron-binary.js"
+    "dist": "rimraf dist && node builder.js",
+    "install-electron-binary": "node scripts/install-electron-binary.js",
+    "sign": "xcrun notarytool submit dist/AudioMothTimeAppSetup${npm_package_version}.dmg --keychain-profile \"oad\" --wait && sudo xcrun stapler staple dist/AudioMothTimeAppSetup${npm_package_version}.dmg"
   },
   "build": {
     "asar": {
@@ -23,9 +24,13 @@
     "mac": {
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.inherit.plist",
-      "target": "dmg"
+      "target": {
+        "target": "dmg",
+        "arch": "universal"
+      }
     },
     "dmg": {
+      "title": "AudioMoth-Time ${version}",
       "contents": [
         {
           "x": 110,
@@ -60,10 +65,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "electron": "42.5.0",
-    "electron-builder": "^26.15.3",
+    "electron": "43.8.3",
+    "electron-builder": "^26.18.0",
     "eslint": "^10.6.0",
-    "globals": "^17.7.0"
+    "globals": "^17.7.0",
+    "rimraf": "^6.1.4"
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",

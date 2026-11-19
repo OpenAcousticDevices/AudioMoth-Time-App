@@ -19,6 +19,38 @@ let mainWindow, aboutWindow;
 
 const path = require('path');
 
+const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
+const standardWindowSettings = {
+    resizable: false,
+    fullscreenable: false,
+    minimizable: false,
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, iconLocation),
+    useContentSize: true,
+    webPreferences: {
+        contextIsolation: false,
+        nodeIntegration: true,
+        sandbox: false
+    }
+};
+
+/* Generate settings objects for windows */
+
+function generateSettings (width, height, title) {
+
+    const uniqueSettings = {
+        width,
+        height,
+        title
+    };
+
+    const settings = Object.assign({}, standardWindowSettings, uniqueSettings);
+    settings.parent = mainWindow;
+
+    return settings;
+
+}
+
 function openAboutWindow () {
 
     if (aboutWindow) {
@@ -28,8 +60,6 @@ function openAboutWindow () {
 
     }
 
-    let iconLocation = '/build/icon.ico';
-
     let windowWidth = 400;
     let windowHeight = 310;
 
@@ -38,8 +68,6 @@ function openAboutWindow () {
         windowWidth = 395;
         windowHeight = 310;
 
-        iconLocation = '/build/icon.png';
-
     } else if (process.platform === 'darwin') {
 
         windowWidth = 395;
@@ -47,28 +75,14 @@ function openAboutWindow () {
 
     }
 
-    aboutWindow = new BrowserWindow({
-        width: windowWidth,
-        height: windowHeight,
-        title: 'About AudioMoth Time App',
-        resizable: false,
-        fullscreenable: false,
-        minimizable: false,
-        useContentSize: true,
-        autoHideMenuBar: true,
-        icon: path.join(__dirname, iconLocation),
-        parent: mainWindow,
-        webPreferences: {
-            contextIsolation: false,
-            nodeIntegration: true,
-            sandbox: false
-        }
-    });
-
-    aboutWindow.loadFile('about.html');
-    aboutWindow.setMenu(null);
+    const settings = generateSettings(windowWidth, windowHeight, 'About AudioMoth Time App');
+    aboutWindow = new BrowserWindow(settings);
 
     require('@electron/remote/main').enable(aboutWindow.webContents);
+
+    aboutWindow.setMenu(null);
+    aboutWindow.loadFile('about.html');
+
 
     if (!app.isPackaged) {
 

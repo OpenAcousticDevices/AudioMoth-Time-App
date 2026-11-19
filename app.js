@@ -294,8 +294,9 @@ electron.ipcRenderer.on('update-check', function () {
 
             dialog.showMessageBox(getCurrentWindow(), {
                 type: 'info',
+                buttons: ['OK'],
                 title: 'Update not needed',
-                message: 'Your app is on the latest version (' + response.latestVersion + ').'
+                message: 'AudioMoth Time App is on the latest version (' + response.latestVersion + ').'
             });
 
             return;
@@ -305,7 +306,7 @@ electron.ipcRenderer.on('update-check', function () {
         const buttonIndex = dialog.showMessageBoxSync({
             type: 'warning',
             buttons: ['Yes', 'No'],
-            title: 'Are you sure?',
+            title: 'Download newer version',
             message: 'A newer version of this app is available (' + response.latestVersion + '), would you like to download it?'
         });
 
